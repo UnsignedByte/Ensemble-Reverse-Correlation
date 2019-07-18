@@ -1,0 +1,18 @@
+function noise = generate_noise(size)
+    function snoise = subnoise(cycles)
+        snoise = nan(size);
+        for i = 1:cycles
+            for j = 1:cycles
+            end
+        end
+        function ssnoise = subsubnoise()
+            for jj = 1:2
+                for ii = 1:6
+                    theta = (ii-1)*30;
+                    ssnoise = ssnoise + sin((X*cosd(theta)-Y*sind(theta))*(4*pi*cycles/size)) ... %generate sin wave 
+                        .*(rand*2-1); %set contrast
+                end
+            end
+        end
+    end
+end
