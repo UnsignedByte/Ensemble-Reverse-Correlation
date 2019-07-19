@@ -15,7 +15,7 @@ traitind = find(strcmp(ensembledat(5,:), trait));
 ensembledat = ensembledat(6:end,:);
 ensembledat = sortrows(ensembledat, traitind);
 
-if reversed
+if reversed == 1
     ensembledat = flip(ensembledat, 1);
 end
 
