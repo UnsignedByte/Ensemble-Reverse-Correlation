@@ -8,14 +8,13 @@ init = upper(input('Initials: ', 's'));
 trait = 'Trustworthy'; %Trait of skewed ensemble
 reversed = 0; %Trait or anti-trait?
 ensembledat = readcell(fullfile('CFD Version 2.0.3', 'CFD 2.0.3 Norming Data and Codebook.xlsx'), 'Sheet', 'CFD 2.0.3 Norming Data'); %Read in ensemble excel
-ensembledat = dat(6:end,:);
-ensembledat = sortrows(dat, tid);
+traitind = find(strcmp(ensembledat(5,:), trait));
+ensembledat = ensembledat(6:end,:);
+ensembledat = sortrows(ensembledat, traitind);
 
 if reversed
     ensembledat = flip(ensembledat, 1);
 end
-
-tid = find(strcmp(ensembledat(5,:), trait));
 
 
 baseImg = rgb2gray(imread('male.jpg'));
