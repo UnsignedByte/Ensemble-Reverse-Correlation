@@ -33,9 +33,11 @@ inv = zeros(siz,siz,trials); %what they dont
 
 RestrictKeysForKbCheck([KbName('f'), KbName('j')]); %Restrict to f and j keys
 
+noises = {};
+
 for t = 1:trials
-    n = generate_noise(siz);
-    ims = (cat(3, min(uint8(double(baseImg) + n),255), min(uint8(double(baseImg) - n),255)));
+    noises{t} = generate_noise(siz);
+    ims = (cat(3, min(uint8(double(baseImg) + noises{t}),255), min(uint8(double(baseImg) - noises{t}),255)));
     ims = ims(:,:,randperm(2));
     Screen('DrawTexture', w, Screen('MakeTexture',w,ims(:,:,1)), [], [[ww/4;wh/2]-siz/2;[ww/4;wh/2]+siz/2]);
     Screen('DrawTexture', w, Screen('MakeTexture',w,ims(:,:,2)), [], [[3*ww/4;wh/2]-siz/2;[3*ww/4;wh/2]+siz/2]);
@@ -53,13 +55,11 @@ for t = 1:trials
     Screen('Flip',w);
     WaitSecs(0.05);
 end
-ci = uint8(mean(res,3)); %final CI
-aci = uint8(mean(inv,3)); %final anti CI
+
 Screen('CloseAll');
 if ~isfolder('Ensemble RC Results') mkdir('Ensemble RC Results'); end %saving
 cd 'Ensemble RC Results';
 if ~isfolder(init) mkdir(init); end %saving
 cd(init);
-imwrite(ci,gray(256),'CI.jpg');
-imwrite(aci,gray(256),'antiCI.jpg');
+save('noises.mat', 'noises');
 cd ../..;
