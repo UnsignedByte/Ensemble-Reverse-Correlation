@@ -4,7 +4,10 @@ rng('Shuffle');
 KbName('UnifyKeyNames');
 init = upper(input('Initials: ', 's'));
 [w, rect] = Screen('OpenWindow', 0, []);
+ww = rect(3); wh = rect(4);
 
+
+num = 6; % # in ensemble
 trait = 'Trustworthy'; %Trait of skewed ensemble
 reversed = 0; %Trait or anti-trait?
 ensembledat = readcell(fullfile('CFD Version 2.0.3', 'CFD 2.0.3 Norming Data and Codebook.xlsx'), 'Sheet', 'CFD 2.0.3 Norming Data'); %Read in ensemble excel
@@ -16,11 +19,16 @@ if reversed
     ensembledat = flip(ensembledat, 1);
 end
 
+rows = 2;  cols = 3;
+h = 1718/10;
+w = 2444/10;
+[xC,yC] = meshgrid(linspace(ww/4,3*ww/4,cols),linspace(wh/4,3*wh/4,rows));
+coordinates = [xC(:)'-(w/2);yC(:)'-(h/2);xC(:)'+(w/2);yC(:)'+(h/2)];
+
 
 baseImg = rgb2gray(imread('male.jpg'));
 trials = 3; %100
 subjects = 2; %4
-ww = rect(3); wh = rect(4);
 siz = size(baseImg, 1);
 res = zeros(siz,siz,trials); %what they choose
 inv = zeros(siz,siz,trials); %what they dont
