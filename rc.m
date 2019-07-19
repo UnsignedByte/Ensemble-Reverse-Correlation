@@ -1,4 +1,3 @@
-clear all;  close all;
 Screen('Preference', 'SkipSyncTests', 1);
 rng('Shuffle');
 KbName('UnifyKeyNames');
@@ -24,7 +23,6 @@ h = 1718/10;
 w = 2444/10;
 [xC,yC] = meshgrid(linspace(ww/4,3*ww/4,cols),linspace(wh/4,3*wh/4,rows));
 coordinates = [xC(:)'-(w/2);yC(:)'-(h/2);xC(:)'+(w/2);yC(:)'+(h/2)];
-
 
 baseImg = rgb2gray(imread('male.jpg'));
 trials = 3; %100
