@@ -2,6 +2,7 @@ clear all;  close all;
 Screen('Preference', 'SkipSyncTests', 1);
 rng('Shuffle');
 KbName('UnifyKeyNames');
+init = upper(input('Initials: ', 's'));
 [w, rect] = Screen('OpenWindow', 0, []);
 
 baseImg = rgb2gray(imread('male.jpg'));
@@ -39,7 +40,9 @@ aci = uint8(mean(inv,3)); %final anti CI
 Screen('CloseAll');
 if ~isfolder('Ensemble RC Results') mkdir('Ensemble RC Results'); end %saving 
 cd 'Ensemble RC Results';
+if ~isfolder(init) mkdir(init); end %saving 
+cd(init);
 imwrite(ci,gray(256),'CI.jpg');
 imwrite(aci,gray(256),'antiCI.jpg');
-cd ..;
+cd ../..;
 
