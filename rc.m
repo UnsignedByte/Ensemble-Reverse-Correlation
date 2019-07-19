@@ -42,4 +42,3 @@ cd 'Ensemble RC Results';
 imwrite(ci,gray(256),'CI.jpg');
 imwrite(aci,gray(256),'antiCI.jpg');
 cd ..;
-
