@@ -9,7 +9,7 @@ ww = rect(3); wh = rect(4);
 
 num = 6; % # in ensemble
 trait = 'Trustworthy'; %Trait of skewed ensemble
-reversed = 0; %Trait or anti-trait?
+reversed = 0; %Trait or anti-trait? 0 = skew towards trait, -1 = skew opposite
 ensembledat = readcell(fullfile('CFD Version 2.0.3', 'CFD 2.0.3 Norming Data and Codebook.xlsx'), 'Sheet', 'CFD 2.0.3 Norming Data'); %Read in ensemble excel
 traitind = find(strcmp(ensembledat(5,:), trait));
 ensembledat = ensembledat(6:end,:);
