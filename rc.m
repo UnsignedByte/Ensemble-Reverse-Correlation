@@ -4,6 +4,19 @@ rng('Shuffle');
 KbName('UnifyKeyNames');
 [w, rect] = Screen('OpenWindow', 0, []);
 
+trait = 'Trustworthy'; %Trait of skewed ensemble
+reversed = 0; %Trait or anti-trait?
+ensembledat = readcell(fullfile('CFD Version 2.0.3', 'CFD 2.0.3 Norming Data and Codebook.xlsx'), 'Sheet', 'CFD 2.0.3 Norming Data'); %Read in ensemble excel
+ensembledat = dat(6:end,:);
+ensembledat = sortrows(dat, tid);
+
+if reversed
+    ensembledat = flip(ensembledat, 1);
+end
+
+tid = find(strcmp(ensembledat(5,:), trait));
+
+
 baseImg = rgb2gray(imread('male.jpg'));
 trials = 3; %100
 subjects = 2; %4
