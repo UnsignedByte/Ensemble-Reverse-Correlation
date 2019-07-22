@@ -9,11 +9,7 @@ num = 6; % # in ensemble
 
 baseImg = rgb2gray(imread('male.jpg'));
 subjects = 2; %4
-<<<<<<< HEAD
-trials = 1; %per subject
-=======
 trials = 3; %100
->>>>>>> 7b199ac7c389a846c79bd6ebd1686d7dca100a04
 
 if isfile('ensembledat.mat')
     load('ensembledat.mat');
