@@ -18,11 +18,15 @@ if reversed == 1
     ensembledat = flip(ensembledat, 1);
 end
 
-rows = 2;  cols = 3;
-h = 1718/10;
-w = 2444/10;
-[xC,yC] = meshgrid(linspace(ww/4,3*ww/4,cols),linspace(wh/4,3*wh/4,rows));
-coordinates = [xC(:)'-(w/2);yC(:)'-(h/2);xC(:)'+(w/2);yC(:)'+(h/2)];
+ensembles = {create_ensemble(num,-1,1),create_ensemble(num,0,1),create_ensemble(num,1,1)};
+data = {create_ensemble(num,-1,2),create_ensemble(num,0,2),create_ensemble(num,1,2)};
+
+tid = zeros(3,num);
+for i = 1:3
+    for j = 1:num
+        tid(i,j) = Screen('MakeTexture', window, ensembles{i,j});
+    end
+end
 
 baseImg = rgb2gray(imread('male.jpg'));
 trials = 3; %100
@@ -34,8 +38,22 @@ inv = zeros(siz,siz,trials); %what they dont
 RestrictKeysForKbCheck([KbName('f'), KbName('j')]); %Restrict to f and j keys
 
 noises = {};
+order = horzcat(ones(1,trials),2*ones(1,trials), 3*ones(1,trials));
+order = order(randperm(3*trails));
 
-for t = 1:trials
+rows = 2;  cols = 3;
+w = ww/5;
+h = w*1718/2444;
+[xC,yC] = meshgrid(linspace(ww/4,3*ww/4,cols),linspace(wh/4,3*wh/4,rows));
+coordinates = [xC(:)'-(w/2);yC(:)'-(h/2);xC(:)'+(w/2);yC(:)'+(h/2)];
+
+for t = 1:3*trials
+    curEnsemble = tid(order(t),:);
+    Screen('DrawTextures', window, curEnsemble, [], coordinates); % display in grid
+    Screen('Flip', window);
+    WaitSecs(1);
+    Screen('Flip', window);
+    
     noises{t} = generate_noise(siz);
     ims = (cat(3, min(uint8(double(baseImg) + noises{t}),255), min(uint8(double(baseImg) - noises{t}),255)));
     ims = ims(:,:,randperm(2));
