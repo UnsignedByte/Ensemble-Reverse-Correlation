@@ -2,7 +2,7 @@ Screen('Preference', 'SkipSyncTests', 1);
 rng('Shuffle');
 KbName('UnifyKeyNames');
 init = upper(input('Initials: ', 's'));
-[w, rect] = Screen('OpenWindow', 0, []);
+[window, rect] = Screen('OpenWindow', 0, []);
 ww = rect(3); wh = rect(4);
 
 
@@ -39,9 +39,9 @@ for t = 1:trials
     noises{t} = generate_noise(siz);
     ims = (cat(3, min(uint8(double(baseImg) + noises{t}),255), min(uint8(double(baseImg) - noises{t}),255)));
     ims = ims(:,:,randperm(2));
-    Screen('DrawTexture', w, Screen('MakeTexture',w,ims(:,:,1)), [], [[ww/4;wh/2]-siz/2;[ww/4;wh/2]+siz/2]);
-    Screen('DrawTexture', w, Screen('MakeTexture',w,ims(:,:,2)), [], [[3*ww/4;wh/2]-siz/2;[3*ww/4;wh/2]+siz/2]);
-    Screen('Flip',w);
+    Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,1)), [], [[ww/4;wh/2]-siz/2;[ww/4;wh/2]+siz/2]);
+    Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,2)), [], [[3*ww/4;wh/2]-siz/2;[3*ww/4;wh/2]+siz/2]);
+    Screen('Flip',window);
 
     [~, keyCode] = KbStrokeWait();
 
@@ -52,7 +52,7 @@ for t = 1:trials
         res(:,:,t) = ims(:,:,2);
         inv(:,:,t) = ims(:,:,1);
     end
-    Screen('Flip',w);
+    Screen('Flip',window);
     WaitSecs(0.05);
 end
 
