@@ -9,7 +9,7 @@ for i = 1:2
     ensembledat{i}(:,1) = fullfile('CFD Version 2.0.3', 'CFD 2.0.3 Images', ensembledat{i}(:,1));
     for j = 1:size(ensembledat{i},1)
         imfile = dir(fullfile(ensembledat{i}{j}, fnames{j}));
-        ensembledat{i}{j} = imresize(imread(fullfile(ensembledat{i}{j},imfile(1).name)), 0.5);
+        ensembledat{i}{j} = imread(fullfile(ensembledat{i}{j},imfile(1).name));
     end
 end
 

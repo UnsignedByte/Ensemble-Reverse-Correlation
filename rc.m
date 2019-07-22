@@ -3,13 +3,15 @@ rng('Shuffle');
 KbName('UnifyKeyNames');
 init = upper(input('Initials: ', 's'));
 [window, rect] = Screen('OpenWindow', 0, []);
+HideCursor();
 ww = rect(3); wh = rect(4);
 
 num = 6; % # in ensemble
 
 baseImg = rgb2gray(imread('male.jpg'));
 subjects = 2; %4
-trials = 3; %100
+trials = 100; %100
+siz = size(baseImg, 1);
 
 if isfile('ensembledat.mat')
     load('ensembledat.mat');
@@ -23,11 +25,13 @@ ensembledata = cell(3, trials);
 noises = cell(trials,1);
 
 for i = 1:trials
+    DrawFormattedText(window, ['Generating Noise...\n' num2str(floor(i/trials*100)) '%'], 'center', 'center');
+    Screen('Flip', window);
     noises{i} = generate_noise(siz);
 end
-noises = repmat(noises, 3,1);
+noises = repmat(noises, 1,3)';
 for i = 1:3
-    noises(:, i) = noises(i, randperm(trials));
+    noises(i,:) = noises(i, randperm(trials));
 end
 
 for i = -1:1
@@ -42,14 +46,10 @@ mask = imread('ovalmask.jpg');
 
 tid = cell(3*trials, num);
 for i = 1:3*trials
-    for j = 1:num
-        a = ensembles{floor(ord{i}),mod(ord{i},trials)}{j};
-        a(:,:,4) = mask;
-        tid{i,j} = Screen('MakeTexture', window, ensembles{floor(ord{i}),mod(ord{i},trials)}{j});
+    for j = 1:num  
+        tid{i,j} = Screen('MakeTexture', window, ensembles{ceil(ord(i)/trials),mod(ord(i),trials)}{j});
     end
 end
-
-siz = size(baseImg, 1);
 res = zeros(siz,siz,trials); %what they choose
 inv = zeros(siz,siz,trials); %what they dont
 
@@ -67,7 +67,7 @@ coordinates = [x_circle(:)'-(w/2);y_circle(:)'-(h/2);x_circle(:)'+(w/2);y_circle
 
 ens_time = 1; %time ensemble is shown
 delay1 = 0.5; %time btwn ensemble and rc
-delay2 = 3; %time of crossheir
+delay2 = 1; %time of crosshair
 
 chosen = ones(3, trials); %List of chosen thingse
 
@@ -76,7 +76,7 @@ for t = 1:3*trials
     Screen('Flip', window);
     WaitSecs(delay2);
     curEnsemble = cell2mat(tid(t,:)');
-    curNoise = noises{floor(ord{t}),mod(ord{t},trials)};
+    curNoise = noises{ceil(ord(t)/trials),mod(ord(t),trials)};
     Screen('FillArc', window, 0,[[ww/2;wh/2]-wh/100;[ww/2;wh/2]+wh/100],0,360);
     Screen('DrawTextures', window, curEnsemble, [], coordinates); % display in grid
     Screen('Flip', window);
@@ -93,7 +93,7 @@ for t = 1:3*trials
     [~, keyCode] = KbStrokeWait();
 
     if keyCode(KbName('j')) == 1
-        chosen(floor(ord{t}),mod(ord{t},trials)) = -1;
+        chosen(ceil(ord(t)/trials),mod(ord(t),trials)) = -1;
     end
     Screen('Flip',window);
 
