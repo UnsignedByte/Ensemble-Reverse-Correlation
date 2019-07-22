@@ -50,7 +50,7 @@ for i = 1:3*trials
         DrawFormattedText(window, ['Making Textures...\n' num2str(floor(((i-1)*num+j)/trials/num/3*100)) '%'], 'center', 'center');
         Screen('Flip', window);
         a = ensembles{ceil(ord(i)/trials),mod(ord(i),trials)+1}{j};
-        a(:,:,4) = mask;
+        a(:,:,4) = imresize(mask, size(a(:,:,1)));
         tid{i,j} = Screen('MakeTexture', window, a);
     end
 end
