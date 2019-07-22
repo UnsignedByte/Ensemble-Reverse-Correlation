@@ -43,12 +43,17 @@ h = w*1718/2444;
 [xC,yC] = meshgrid(linspace(ww/4,3*ww/4,cols),linspace(wh/4,3*wh/4,rows));
 coordinates = [xC(:)'-(w/2);yC(:)'-(h/2);xC(:)'+(w/2);yC(:)'+(h/2)];
 
+ens_time = 1; %time ensemble is shown
+delay1 = 0.02; %time btwn ensemble and rc
+delay2 = 0.05; %time btwn rc and next ensemble
+
 for t = 1:3*trials
     curEnsemble = tid(t,:);
     Screen('DrawTextures', window, curEnsemble, [], coordinates); % display in grid
     Screen('Flip', window);
-    WaitSecs(1);
+    WaitSecs(ens_time);
     Screen('Flip', window);
+    WaitSecs(delay1);
     
     noises{t} = generate_noise(siz);
     ims = (cat(3, min(uint8(double(baseImg) + noises{t}),255), min(uint8(double(baseImg) - noises{t}),255)));
@@ -67,7 +72,7 @@ for t = 1:3*trials
         inv(:,:,t) = ims(:,:,1);
     end
     Screen('Flip',window);
-    WaitSecs(0.05);
+    WaitSecs(delay2);
 end
 
 Screen('CloseAll');
