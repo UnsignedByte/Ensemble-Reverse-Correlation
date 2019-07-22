@@ -9,7 +9,7 @@ num = 6; % # in ensemble
 
 baseImg = rgb2gray(imread('male.jpg'));
 subjects = 2; %4
-trials = 3; %100
+trials = 1; %100
 
 if isfile('ensembledat.mat')
     load('ensembledat.mat');
@@ -20,8 +20,21 @@ end
 ensembles = {};
 ensembledata = {};
 
+tnoises = {};
+
+for i = 1:trials
+    tnoises{i} = generate_noise(siz);
+end
+tnoises = repmat(tnoises, 3,1);
+for i = 1:3
+    tnoises(:, i) = tnoises(i, randperm(trials));
+end
+
+noises = {};
+
 for i = -1:1
     for j = 1:trials
+        noises{j+(i+1)*trials} = tnoises{i+2, j};
         [ensembles{j+(i+1)*trials},ensembledata{j+(i+1)*trials}] = create_ensemble(ensembledat, num, i);
     end
 end
@@ -39,8 +52,6 @@ inv = zeros(siz,siz,trials); %what they dont
 
 RestrictKeysForKbCheck([KbName('f'), KbName('j')]); %Restrict to f and j keys
 
-noises = {};
-
 rows = 2;  cols = 3;
 w = ww/5;
 h = w*1718/2444;
@@ -53,13 +64,13 @@ delay2 = 0.05; %time btwn rc and next ensemble
 
 for t = 1:3*trials
     curEnsemble = cell2mat(tid(t,:)');
+    
     Screen('DrawTextures', window, curEnsemble, [], coordinates); % display in grid
     Screen('Flip', window);
     WaitSecs(ens_time);
     Screen('Flip', window);
     WaitSecs(delay1);
     
-    noises{t} = generate_noise(siz);
     ims = (cat(3, min(uint8(double(baseImg) + noises{t}),255), min(uint8(double(baseImg) - noises{t}),255)));
     ims = ims(:,:,randperm(2));
     Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,1)), [], [[ww/4;wh/2]-siz/2;[ww/4;wh/2]+siz/2]);
