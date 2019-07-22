@@ -45,7 +45,9 @@ ord = randperm(3*trials);
 tid = cell(3*trials, num);
 for i = 1:3*trials
     for j = 1:num
-        tid{i,j} = Screen('MakeTexture', window, ensembles{ceil(ord(i)/trials),mod(ord(i),trials)}{j});
+        DrawFormattedText(window, ['Making Textures...\n' num2str(floor(((i-1)*num+j)/trials/num/3*100)) '%'], 'center', 'center');
+        Screen('Flip', window);
+        tid{i,j} = Screen('MakeTexture', window, ensembles{ceil(ord(i)/trials),mod(ord(i),trials)+1}{j});
     end
 end
 res = zeros(siz,siz,trials); %what they choose
@@ -74,7 +76,7 @@ for t = 1:3*trials
     Screen('Flip', window);
     WaitSecs(delay2);
     curEnsemble = cell2mat(tid(t,:)');
-    curNoise = noises{ceil(ord(t)/trials),mod(ord(t),trials)};
+    curNoise = noises{ceil(ord(t)/trials),mod(ord(t),trials)+1};
     Screen('FillArc', window, 0,[[ww/2;wh/2]-wh/100;[ww/2;wh/2]+wh/100],0,360);
     Screen('DrawTextures', window, curEnsemble, [], coordinates); % display in grid
     Screen('Flip', window);
@@ -91,7 +93,7 @@ for t = 1:3*trials
     [~, keyCode] = KbStrokeWait();
 
     if keyCode(KbName('j')) == 1
-        chosen(ceil(ord(t)/trials),mod(ord(t),trials)) = -1;
+        chosen(ceil(ord(t)/trials),mod(ord(t),trials)+1) = -1;
     end
     Screen('Flip',window);
 
