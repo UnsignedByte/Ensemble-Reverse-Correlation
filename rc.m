@@ -11,7 +11,11 @@ baseImg = rgb2gray(imread('male.jpg'));
 subjects = 2; %4
 trials = 3; %100
 
-load('ensembledat.mat');
+if isfile('ensembledat.mat')
+    load('ensembledat.mat');
+else
+    gen_ensembledat;
+end
 
 ensembles = {};
 ensembledata = {};
@@ -25,7 +29,7 @@ end
 tid = cell(3*trials, num);
 for i = 1:3*trials
     for j = 1:num
-        tid(i,j) = Screen('MakeTexture', window, ensembles{i}{j});
+        tid{i,j} = Screen('MakeTexture', window, ensembles{i}{j});
     end
 end
 
@@ -48,7 +52,7 @@ delay1 = 0.02; %time btwn ensemble and rc
 delay2 = 0.05; %time btwn rc and next ensemble
 
 for t = 1:3*trials
-    curEnsemble = tid(t,:);
+    curEnsemble = cell2mat(tid(t,:)');
     Screen('DrawTextures', window, curEnsemble, [], coordinates); % display in grid
     Screen('Flip', window);
     WaitSecs(ens_time);
