@@ -53,24 +53,27 @@ inv = zeros(siz,siz,trials); %what they dont
 RestrictKeysForKbCheck([KbName('f'), KbName('j')]); %Restrict to f and j keys
 
 rows = 2;  cols = 3;
-w = ww/5;
+w = ww/7;
 h = w*1718/2444;
-[xC,yC] = meshgrid(linspace(ww/4,3*ww/4,cols),linspace(wh/4,3*wh/4,rows));
+[xC,yC] = meshgrid(linspace(ww/3,2*ww/3,cols),linspace(wh/3,2*wh/3,rows));
 coordinates = [xC(:)'-(w/2);yC(:)'-(h/2);xC(:)'+(w/2);yC(:)'+(h/2)];
 
 ens_time = 1; %time ensemble is shown
-delay1 = 0.02; %time btwn ensemble and rc
-delay2 = 0.05; %time btwn rc and next ensemble
+delay1 = 0.5; %time btwn ensemble and rc
+delay2 = 3; %time of crossheir
 
 for t = 1:3*trials
+    Screen('FillArc', window, 0,[[ww/2;wh/2]-wh/100;[ww/2;wh/2]+wh/100],0,360);
+    Screen('Flip', window);
+    WaitSecs(delay2);
     curEnsemble = cell2mat(tid(t,:)');
-    
+    Screen('FillArc', window, 0,[[ww/2;wh/2]-wh/100;[ww/2;wh/2]+wh/100],0,360);
     Screen('DrawTextures', window, curEnsemble, [], coordinates); % display in grid
     Screen('Flip', window);
     WaitSecs(ens_time);
     Screen('Flip', window);
     WaitSecs(delay1);
-    
+
     ims = (cat(3, min(uint8(double(baseImg) + noises{t}),255), min(uint8(double(baseImg) - noises{t}),255)));
     ims = ims(:,:,randperm(2));
     Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,1)), [], [[ww/4;wh/2]-siz/2;[ww/4;wh/2]+siz/2]);
@@ -87,7 +90,7 @@ for t = 1:3*trials
         inv(:,:,t) = ims(:,:,1);
     end
     Screen('Flip',window);
-    WaitSecs(delay2);
+
 end
 
 Screen('CloseAll');
