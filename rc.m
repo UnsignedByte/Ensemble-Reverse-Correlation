@@ -48,12 +48,16 @@ w = ww/8;
 h = w*1718/2444;
 
 mask = imread('ovalmask.jpg');
+mask = imresize(mask, size(ensembles{1,1}{1}(:,:,1)));
+mask = mask(:,:,1);
 
 tid = cell(3*trials, num);
 for i = 1:3*trials
-    for j = 1:num  
-        a = ensembles{ceil(ord(i)/trials),mod(ord(i),trials)}{j};
-        a(:,:,4) = imresize(mask, [h w]);
+    for j = 1:num
+        DrawFormattedText(window, ['Making Textures...\n' num2str(floor(((i-1)*num+j)/trials/num/3*100)) '%'], 'center', 'center');
+        Screen('Flip', window);
+        a = ensembles{ceil(ord(i)/trials),mod(ord(i),trials)+1}{j};
+        a(:,:,4) = mask;
         tid{i,j} = Screen('MakeTexture', window, a);
     end
 end
@@ -69,7 +73,7 @@ th = linspace(360/num, 360, num);
 x_circle = ww/2+cosd(th)*radius;
 y_circle = wh/2+sind(th)*radius;
 
-coordinates = [x_circle(:)'-(w/2);y_circle(:)'-(h/2);x_circle(:)'+(w/2);y_circle(:)'+(h/2)]; 
+coordinates = [x_circle(:)'-(w/2);y_circle(:)'-(h/2);x_circle(:)'+(w/2);y_circle(:)'+(h/2)];
 
 ens_time = 1; %time ensemble is shown
 delay1 = 0.5; %time btwn ensemble and rc
@@ -82,8 +86,10 @@ for t = 1:3*trials
     Screen('Flip', window);
     WaitSecs(delay2);
     curEnsemble = cell2mat(tid(t,:)');
+
     curNoise = noises{ceil(ord(t)/trials),mod(ord(t),trials)};
     Screen('FillArc', window, 0,[[ww/2;wh/2]-wh/200;[ww/2;wh/2]+wh/200],0,360);
+
     Screen('DrawTextures', window, curEnsemble, [], coordinates); % display in grid
     Screen('Flip', window);
     WaitSecs(ens_time);
@@ -99,7 +105,7 @@ for t = 1:3*trials
     [~, keyCode] = KbStrokeWait();
 
     if keyCode(KbName('j')) == 1
-        chosen(ceil(ord(t)/trials),mod(ord(t),trials)) = -1;
+        chosen(ceil(ord(t)/trials),mod(ord(t),trials)+1) = -1;
     end
     Screen('Flip',window);
 
