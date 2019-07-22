@@ -9,7 +9,11 @@ num = 6; % # in ensemble
 
 baseImg = rgb2gray(imread('male.jpg'));
 subjects = 2; %4
-trials = 1; %100
+<<<<<<< HEAD
+trials = 1; %per subject
+=======
+trials = 3; %100
+>>>>>>> 7b199ac7c389a846c79bd6ebd1686d7dca100a04
 
 if isfile('ensembledat.mat')
     load('ensembledat.mat');
@@ -17,32 +21,31 @@ else
     gen_ensembledat;
 end
 
-ensembles = {};
-ensembledata = {};
+ensembles = cell(3, trials);
+ensembledata = cell(3, trials);
 
-tnoises = {};
+noises = cell(trials,1);
 
 for i = 1:trials
-    tnoises{i} = generate_noise(siz);
+    noises{i} = generate_noise(siz);
 end
-tnoises = repmat(tnoises, 3,1);
+noises = repmat(noises, 3,1);
 for i = 1:3
-    tnoises(:, i) = tnoises(i, randperm(trials));
+    noises(:, i) = noises(i, randperm(trials));
 end
-
-noises = {};
 
 for i = -1:1
     for j = 1:trials
-        noises{j+(i+1)*trials} = tnoises{i+2, j};
-        [ensembles{j+(i+1)*trials},ensembledata{j+(i+1)*trials}] = create_ensemble(ensembledat, num, i);
+        [ensembles{i+2,j},ensembledata{i+2,j}] = create_ensemble(ensembledat, num, i);
     end
 end
+
+ord = randperm(3*trials);
 
 tid = cell(3*trials, num);
 for i = 1:3*trials
     for j = 1:num
-        tid{i,j} = Screen('MakeTexture', window, ensembles{i}{j});
+        tid{i,j} = Screen('MakeTexture', window, ensembles{floor(ord{i}),mod(ord{i},trials)}{j});
     end
 end
 
@@ -66,11 +69,14 @@ ens_time = 1; %time ensemble is shown
 delay1 = 0.5; %time btwn ensemble and rc
 delay2 = 3; %time of crossheir
 
+chosen = ones(3, trials); %List of chosen thingse
+
 for t = 1:3*trials
     Screen('FillArc', window, 0,[[ww/2;wh/2]-wh/100;[ww/2;wh/2]+wh/100],0,360);
     Screen('Flip', window);
     WaitSecs(delay2);
     curEnsemble = cell2mat(tid(t,:)');
+    curNoise = noises{floor(ord{t}),mod(ord{t},trials)};
     Screen('FillArc', window, 0,[[ww/2;wh/2]-wh/100;[ww/2;wh/2]+wh/100],0,360);
     Screen('DrawTextures', window, curEnsemble, [], coordinates); % display in grid
     Screen('Flip', window);
@@ -78,7 +84,7 @@ for t = 1:3*trials
     Screen('Flip', window);
     WaitSecs(delay1);
 
-    ims = (cat(3, min(uint8(double(baseImg) + noises{t}),255), min(uint8(double(baseImg) - noises{t}),255)));
+    ims = (cat(3, min(uint8(double(baseImg) + curNoise),255), min(uint8(double(baseImg) - curNoise),255)));
     ims = ims(:,:,randperm(2));
     Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,1)), [], [[ww/4;wh/2]-siz/2;[ww/4;wh/2]+siz/2]);
     Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,2)), [], [[3*ww/4;wh/2]-siz/2;[3*ww/4;wh/2]+siz/2]);
@@ -86,12 +92,8 @@ for t = 1:3*trials
 
     [~, keyCode] = KbStrokeWait();
 
-    if keyCode(KbName('f')) == 1
-        res(:,:,t) = ims(:,:,1);
-        inv(:,:,t) = ims(:,:,2);
-    elseif keyCode(KbName('j')) == 1
-        res(:,:,t) = ims(:,:,2);
-        inv(:,:,t) = ims(:,:,1);
+    if keyCode(KbName('j')) == 1
+        chosen(floor(ord{t}),mod(ord{t},trials)) = -1;
     end
     Screen('Flip',window);
 
@@ -103,4 +105,7 @@ cd 'Ensemble RC Results';
 if ~isfolder(init) mkdir(init); end %saving
 cd(init);
 save('noises.mat', 'noises');
+save('ensembles.mat', 'ensembles');
+save('ensembledata.mat', 'ensembledata');
+save('chosen.mat', 'chosen');
 cd ../..;

@@ -35,11 +35,8 @@ disp('Data saved.');
 %% Program Parameters
 
 % Clear all variables
-clear all;
-close all;
-
 % Initialize the File TrialRecords
-dataFilePath = '/Users/benfalken/Desktop/TrialRecords/';
+dataFilePath = 'TrialRecords/';
 userDataFolder = dir([dataFilePath '*.mat']);
 
 dataFolderLen = length(userDataFolder);
@@ -49,7 +46,7 @@ filterSize = 512;
 trialNum = 100;
 numEnsembleFaces = 6;
 
-% Create array containing all images for user's and all trials
+% Create array containing all images for users and all trials
 userAverages = zeros(4, trialNum*dataFolderLen, filterSize, filterSize);
 
 % Create array containing all ensembles over all trials
