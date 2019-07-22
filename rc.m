@@ -47,7 +47,9 @@ mask = imread('ovalmask.jpg');
 tid = cell(3*trials, num);
 for i = 1:3*trials
     for j = 1:num  
-        tid{i,j} = Screen('MakeTexture', window, ensembles{ceil(ord(i)/trials),mod(ord(i),trials)}{j});
+        a = ensembles{ceil(ord(i)/trials),mod(ord(i),trials)}{j};
+        a(:,:,4) = mask;
+        tid{i,j} = Screen('MakeTexture', window, a);
     end
 end
 res = zeros(siz,siz,trials); %what they choose
