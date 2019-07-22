@@ -11,12 +11,27 @@ ensembledat = ensembledat(6:end,:);
 ensembledat = ensembledat(strcmp(ensembledat(:,3), 'M'),:); %Get only males
 ensembledat = {ensembledat(strcmp(ensembledat(:,2), 'B'),:),ensembledat(strcmp(ensembledat(:,2), 'W'),:)};
 
-if reversed == 1
-    ensembledat = flip(ensembledat, 1);
+for i = 1:2
+    fnames = strcat('CFD-', ensembledat{i}(:,1), '-*-N.jpg');
+    ensembledat{i}(:,1) = fullfile('CFD Version 2.0.3', 'CFD 2.0.3 Images', ensembledat{i}(:,1));
+    for j = 1:size(ensembledat{i},1)
+        imfile = dir(fullfile(ensembledat{i}{j}, fnames{j}));
+        ensembledat{i}{j} = imread(fullfile(ensembledat{i}{j},imfile(1).name));
+    end
 end
 
-ensembles = {create_ensemble(num,-1,1),create_ensemble(num,0,1),create_ensemble(num,1,1)};
-data = {create_ensemble(num,-1,2),create_ensemble(num,0,2),create_ensemble(num,1,2)};
+baseImg = rgb2gray(imread('male.jpg'));
+subjects = 2; %4
+trials = 3; %100
+
+ensembles = {};
+ensembledata = {};
+
+for i = -1:1
+    for j = 1:trials
+        [ensembles{j+(i+1)*trials},ensembledata{j+(i+1)*trials}] = create_ensemble(ensembledat, num, i);
+    end
+end
 
 tid = zeros(3,num);
 for i = 1:3
@@ -25,9 +40,6 @@ for i = 1:3
     end
 end
 
-baseImg = rgb2gray(imread('male.jpg'));
-trials = 3; %100
-subjects = 2; %4
 siz = size(baseImg, 1);
 res = zeros(siz,siz,trials); %what they choose
 inv = zeros(siz,siz,trials); %what they dont

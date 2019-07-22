@@ -1,4 +1,4 @@
-function ensemble,data = create_ensemble(num, skew)
+function [ensemble,data] = create_ensemble(ensembledat, num, skew)
 
     wcols = [1 3 4]; %which columns of data to save
 
@@ -16,11 +16,4 @@ function ensemble,data = create_ensemble(num, skew)
     ensemble = ensemble(randperm(num),:);
     data = ensemble(:, 2:end)';
     ensemble = ensemble(:,1)';
-    fnames = strcat('CFD-', ensemble, '-*-N.jpg');
-    ensemble = fullfile('CFD Version 2.0.3', 'CFD 2.0.3 Images', ensemble);
-    
-    for i = 1:num
-        imfile = dir(fullfile(ensemble{i}, fnames{i}));
-        ensemble{i} = imread(fullfile(ensemble{i},imfile(1).name));
-    end
 end
