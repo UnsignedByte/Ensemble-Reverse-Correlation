@@ -5,6 +5,8 @@ init = upper(input('Initials: ', 's'));
 [window, rect] = Screen('OpenWindow', 0, []);
 HideCursor();
 ww = rect(3); wh = rect(4);
+Screen('BlendFunction', window,GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 
 num = 6; % # in ensemble
 
@@ -42,13 +44,16 @@ end
 
 ord = randperm(3*trials);
 
+w = ww/8;
+h = w*1718/2444;
+
 mask = imread('ovalmask.jpg');
 
 tid = cell(3*trials, num);
 for i = 1:3*trials
     for j = 1:num  
         a = ensembles{ceil(ord(i)/trials),mod(ord(i),trials)}{j};
-        a(:,:,4) = mask;
+        a(:,:,4) = imresize(mask, [h w]);
         tid{i,j} = Screen('MakeTexture', window, a);
     end
 end
@@ -57,8 +62,7 @@ inv = zeros(siz,siz,trials); %what they dont
 
 RestrictKeysForKbCheck([KbName('f'), KbName('j')]); %Restrict to f and j keys
 
-w = ww/8;
-h = w*1718/2444;
+
 
 radius = wh/4;
 th = linspace(360/num, 360, num);
@@ -79,7 +83,7 @@ for t = 1:3*trials
     WaitSecs(delay2);
     curEnsemble = cell2mat(tid(t,:)');
     curNoise = noises{ceil(ord(t)/trials),mod(ord(t),trials)};
-    Screen('FillArc', window, 0,[[ww/2;wh/2]-wh/100;[ww/2;wh/2]+wh/100],0,360);
+    Screen('FillArc', window, 0,[[ww/2;wh/2]-wh/200;[ww/2;wh/2]+wh/200],0,360);
     Screen('DrawTextures', window, curEnsemble, [], coordinates); % display in grid
     Screen('Flip', window);
     WaitSecs(ens_time);
