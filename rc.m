@@ -38,9 +38,13 @@ end
 
 ord = randperm(3*trials);
 
+mask = imread('ovalmask.jpg');
+
 tid = cell(3*trials, num);
 for i = 1:3*trials
     for j = 1:num
+        a = ensembles{floor(ord{i}),mod(ord{i},trials)}{j};
+        a(:,:,4) = mask;
         tid{i,j} = Screen('MakeTexture', window, ensembles{floor(ord{i}),mod(ord{i},trials)}{j});
     end
 end
