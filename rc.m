@@ -43,7 +43,7 @@ end
 ord = randperm(3*trials);
 
 mask = imread('ovalmask.jpg');
-mask = imresize(mask, size(ensembles{1,1,1}(:,:,1)));
+mask = imresize(mask, size(ensembles{1,1}{1}(:,:,1)));
 mask = mask(:,:,1);
 
 tid = cell(3*trials, num);
