@@ -42,12 +42,16 @@ end
 
 ord = randperm(3*trials);
 
+mask = imread('ovalmask.jpg');
+
 tid = cell(3*trials, num);
 for i = 1:3*trials
     for j = 1:num
         DrawFormattedText(window, ['Making Textures...\n' num2str(floor(((i-1)*num+j)/trials/num/3*100)) '%'], 'center', 'center');
         Screen('Flip', window);
-        tid{i,j} = Screen('MakeTexture', window, ensembles{ceil(ord(i)/trials),mod(ord(i),trials)+1}{j});
+        a = ensembles{ceil(ord(i)/trials),mod(ord(i),trials)+1}{j};
+        a(:,:,4) = mask;
+        tid{i,j} = Screen('MakeTexture', window, a);
     end
 end
 res = zeros(siz,siz,trials); %what they choose
@@ -63,7 +67,7 @@ th = linspace(360/num, 360, num);
 x_circle = ww/2+cosd(th)*radius;
 y_circle = wh/2+sind(th)*radius;
 
-coordinates = [x_circle(:)'-(w/2);y_circle(:)'-(h/2);x_circle(:)'+(w/2);y_circle(:)'+(h/2)]; 
+coordinates = [x_circle(:)'-(w/2);y_circle(:)'-(h/2);x_circle(:)'+(w/2);y_circle(:)'+(h/2)];
 
 ens_time = 1; %time ensemble is shown
 delay1 = 0.5; %time btwn ensemble and rc
