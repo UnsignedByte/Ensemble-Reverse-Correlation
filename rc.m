@@ -9,7 +9,7 @@ num = 6; % # in ensemble
 
 baseImg = rgb2gray(imread('male.jpg'));
 subjects = 2; %4
-trials = 1; %100
+trials = 3; %100
 
 if isfile('ensembledat.mat')
     load('ensembledat.mat');
@@ -99,4 +99,6 @@ cd 'Ensemble RC Results';
 if ~isfolder(init) mkdir(init); end %saving
 cd(init);
 save('noises.mat', 'noises');
+save('ensembles.mat', 'ensembles');
+save('ensembledata.mat', 'ensembledata');
 cd ../..;
