@@ -22,3 +22,5 @@ octave-workspace
 
 # Simulink autosave extension
 .autosave
+
+ensembledat.mat

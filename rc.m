@@ -6,23 +6,12 @@ init = upper(input('Initials: ', 's'));
 ww = rect(3); wh = rect(4);
 
 num = 6; % # in ensemble
-ensembledat = readcell(fullfile('CFD Version 2.0.3', 'CFD 2.0.3 Norming Data and Codebook.xlsx'), 'Sheet', 'CFD 2.0.3 Norming Data'); %Read in ensemble excel
-ensembledat = ensembledat(6:end,:);
-ensembledat = ensembledat(strcmp(ensembledat(:,3), 'M'),:); %Get only males
-ensembledat = {ensembledat(strcmp(ensembledat(:,2), 'B'),:),ensembledat(strcmp(ensembledat(:,2), 'W'),:)};
-
-for i = 1:2
-    fnames = strcat('CFD-', ensembledat{i}(:,1), '-*-N.jpg');
-    ensembledat{i}(:,1) = fullfile('CFD Version 2.0.3', 'CFD 2.0.3 Images', ensembledat{i}(:,1));
-    for j = 1:size(ensembledat{i},1)
-        imfile = dir(fullfile(ensembledat{i}{j}, fnames{j}));
-        ensembledat{i}{j} = imread(fullfile(ensembledat{i}{j},imfile(1).name));
-    end
-end
 
 baseImg = rgb2gray(imread('male.jpg'));
 subjects = 2; %4
 trials = 3; %100
+
+load('ensembledat.mat');
 
 ensembles = {};
 ensembledata = {};
@@ -33,10 +22,10 @@ for i = -1:1
     end
 end
 
-tid = zeros(3,num);
-for i = 1:3
+tid = cell(3*trials, num);
+for i = 1:3*trials
     for j = 1:num
-        tid(i,j) = Screen('MakeTexture', window, ensembles{i,j});
+        tid(i,j) = Screen('MakeTexture', window, ensembles{i}{j});
     end
 end
 
@@ -47,8 +36,6 @@ inv = zeros(siz,siz,trials); %what they dont
 RestrictKeysForKbCheck([KbName('f'), KbName('j')]); %Restrict to f and j keys
 
 noises = {};
-order = horzcat(ones(1,trials),2*ones(1,trials), 3*ones(1,trials));
-order = order(randperm(3*trails));
 
 rows = 2;  cols = 3;
 w = ww/5;
@@ -57,7 +44,7 @@ h = w*1718/2444;
 coordinates = [xC(:)'-(w/2);yC(:)'-(h/2);xC(:)'+(w/2);yC(:)'+(h/2)];
 
 for t = 1:3*trials
-    curEnsemble = tid(order(t),:);
+    curEnsemble = tid(t,:);
     Screen('DrawTextures', window, curEnsemble, [], coordinates); % display in grid
     Screen('Flip', window);
     WaitSecs(1);
