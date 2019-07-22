@@ -52,11 +52,15 @@ inv = zeros(siz,siz,trials); %what they dont
 
 RestrictKeysForKbCheck([KbName('f'), KbName('j')]); %Restrict to f and j keys
 
-rows = 2;  cols = 3;
-w = ww/7;
+w = ww/8;
 h = w*1718/2444;
-[xC,yC] = meshgrid(linspace(ww/3,2*ww/3,cols),linspace(wh/3,2*wh/3,rows));
-coordinates = [xC(:)'-(w/2);yC(:)'-(h/2);xC(:)'+(w/2);yC(:)'+(h/2)];
+
+radius = wh/4;
+th = linspace(360/num, 360, num);
+x_circle = ww/2+cosd(th)*radius;
+y_circle = wh/2+sind(th)*radius;
+
+coordinates = [x_circle(:)'-(w/2);y_circle(:)'-(h/2);x_circle(:)'+(w/2);y_circle(:)'+(h/2)]; 
 
 ens_time = 1; %time ensemble is shown
 delay1 = 0.5; %time btwn ensemble and rc
