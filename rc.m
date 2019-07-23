@@ -11,7 +11,7 @@ Screen('BlendFunction', window,GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 num = 6; % # in ensemble
 
 baseImg = rgb2gray(imread('male.jpg'));
-subjects = 2; %4
+
 trials = 100; %100
 siz = size(baseImg, 1);
 
@@ -90,7 +90,7 @@ for t = 1:3*trials
     WaitSecs(delay2);
     curEnsemble = cell2mat(tid(t,:)');
 
-    curNoise = noises{ceil(ord(t)/trials),mod(ord(t),trials)};
+    curNoise = noises{ceil(ord(t)/trials),mod(ord(t),trials)+1};
 
     Screen('DrawTextures', window, curEnsemble, [], coordinates); % display in grid
     Screen('Flip', window);
