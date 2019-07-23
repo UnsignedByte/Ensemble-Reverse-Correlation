@@ -86,12 +86,11 @@ crossW = wh/500;
 
 for t = 1:3*trials
     Screen('DrawLines', window, cross, crossW, 0, [ww/2 wh/2], 2);
-    Screen('Flip', window);
+    Screen('Flip', window, 0, 1);
     WaitSecs(delay2);
     curEnsemble = cell2mat(tid(t,:)');
 
     curNoise = noises{ceil(ord(t)/trials),mod(ord(t),trials)};
-    Screen('DrawLines', window, cross, crossW, 0, [ww/2 wh/2], 2);
 
     Screen('DrawTextures', window, curEnsemble, [], coordinates); % display in grid
     Screen('Flip', window);
@@ -102,6 +101,8 @@ for t = 1:3*trials
     ims = (cat(3, min(uint8(double(baseImg) + curNoise),255), min(uint8(double(baseImg) - curNoise),255)));
     imsord = randperm(2);
     ims = ims(:,:,imsord);
+    
+    DrawFormattedText(window, num2str(t), 'center', 'center'); % Display trial num (will be removed)
     Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,1)), [], [[ww/4;wh/2]-siz/2;[ww/4;wh/2]+siz/2]);
     Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,2)), [], [[3*ww/4;wh/2]-siz/2;[3*ww/4;wh/2]+siz/2]);
     Screen('Flip',window);
