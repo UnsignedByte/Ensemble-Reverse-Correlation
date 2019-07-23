@@ -1,3 +1,5 @@
+%% Setup Screen Parameters
+
 Screen('Preference', 'SkipSyncTests', 1);
 rng('Shuffle');
 KbName('UnifyKeyNames');
@@ -7,13 +9,16 @@ HideCursor();
 ww = rect(3); wh = rect(4);
 Screen('BlendFunction', window,GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+%% Define Trial Variables
 
 num = 6; % # in ensemble
 
 baseImg = rgb2gray(imread('male.jpg'));
-
+subjects = 2; %4
 trials = 100; %100
 siz = size(baseImg, 1);
+
+%% Check for and Load Ensemble Data
 
 if isfile('ensembledat.mat')
     load('ensembledat.mat');
@@ -25,6 +30,8 @@ ensembles = cell(3, trials);
 ensembledata = cell(3, trials);
 
 noises = cell(trials,1);
+
+%% Generate Noise
 
 for i = 1:trials
     DrawFormattedText(window, ['Generating Noise...\n' num2str(floor(i/trials*100)) '%'], 'center', 'center');
@@ -41,6 +48,8 @@ for i = -1:1
         [ensembles{i+2,j},ensembledata{i+2,j}] = create_ensemble(ensembledat, num, i);
     end
 end
+
+%% Generate Textures
 
 ord = randperm(3*trials);
 
@@ -66,7 +75,7 @@ inv = zeros(siz,siz,trials); %what they dont
 
 RestrictKeysForKbCheck([KbName('f'), KbName('j')]); %Restrict to f and j keys
 
-
+%% Setup Trial Graphics Viables
 
 radius = wh/3;
 th = linspace(360/num, 360, num);
@@ -84,13 +93,52 @@ chosen = ones(3, trials); %List of chosen thingse
 cross = [-ww/100 ww/100 0 0;0 0 -ww/100 ww/100];
 crossW = wh/500;
 
+%% Instructions
+
+showBaseImg = Screen('MakeTexture', uint8(double(baseImg)));
+
+Screen('TextFont',window, 'Arial');
+Screen('TextSize',window, 30);
+Screen('TextStyle', window, 0);
+
+DrawFormattedText(window, ...
+    'You will have 300 trials to complete.', ...
+    'center',300,[0 0 0]);
+Screen('Flip');
+
+WaitSecs(delay2);
+
+DrawFormattedText(window,...
+    'You will be shown various images based off of this picture.', ...
+    'center',(wh/2)-100,[0 0 0]);
+Screen('DrawTexture', window, showBaseImg);
+
+WaitSecs(delay2);
+
+DrawFormattedText(window,...
+    'Choose which Image appears more trustworthy, out of the 2 you are shown.', ...
+    'center',(wh/2)+100,[0 0 0]);
+
+Screen('Flip');
+
+DrawFormattedText(window, ...
+    'Click either f or j to begin.\n\n Click f for left image, and j for right image.', ...
+    'center',(wh/2)-100,[0 0 0]);
+
+Screen('Flip');
+
+WaitSecs(delay2);
+
+%% Run Trials
+
 for t = 1:3*trials
     Screen('DrawLines', window, cross, crossW, 0, [ww/2 wh/2], 2);
-    Screen('Flip', window, 0, 1);
+    Screen('Flip', window);
     WaitSecs(delay2);
     curEnsemble = cell2mat(tid(t,:)');
 
-    curNoise = noises{ceil(ord(t)/trials),mod(ord(t),trials)+1};
+    curNoise = noises{ceil(ord(t)/trials),mod(ord(t),trials)};
+    Screen('DrawLines', window, cross, crossW, 0, [ww/2 wh/2], 2);
 
     Screen('DrawTextures', window, curEnsemble, [], coordinates); % display in grid
     Screen('Flip', window);
@@ -101,8 +149,6 @@ for t = 1:3*trials
     ims = (cat(3, min(uint8(double(baseImg) + curNoise),255), min(uint8(double(baseImg) - curNoise),255)));
     imsord = randperm(2);
     ims = ims(:,:,imsord);
-    
-    DrawFormattedText(window, num2str(t), 'center', 'center'); % Display trial num (will be removed)
     Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,1)), [], [[ww/4;wh/2]-siz/2;[ww/4;wh/2]+siz/2]);
     Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,2)), [], [[3*ww/4;wh/2]-siz/2;[3*ww/4;wh/2]+siz/2]);
     Screen('Flip',window);
@@ -117,6 +163,8 @@ for t = 1:3*trials
     Screen('Flip',window);
 
 end
+
+%% End and Save Files
 
 Screen('CloseAll');
 if ~isfolder('Ensemble RC Results') mkdir('Ensemble RC Results'); end %saving
