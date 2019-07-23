@@ -82,7 +82,7 @@ delay2 = 1; %time of crosshair
 chosen = ones(3, trials); %List of chosen thingse
 
 for t = 1:3*trials
-    Screen('FillArc', window, 0,[[ww/2;wh/2]-wh/100;[ww/2;wh/2]+wh/100],0,360);
+    Screen('FillArc', window, 0,[[ww/2;wh/2]-wh/200;[ww/2;wh/2]+wh/200],0,360);
     Screen('Flip', window);
     WaitSecs(delay2);
     curEnsemble = cell2mat(tid(t,:)');
