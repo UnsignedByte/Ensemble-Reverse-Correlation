@@ -31,7 +31,7 @@ for i = 1:trials
     Screen('Flip', window);
     noises{i} = generate_noise(siz);
 end
-noises = repmat(noises, 1,3)';
+noises = repmat(noises, 1,3);
 for i = 1:3
     noises(i,:) = noises(i, randperm(trials));
 end
