@@ -16,7 +16,7 @@ num = 6; % # in ensemble
 baseImg = rgb2gray(imread('male.jpg'));
 
 
-trials = 100; %100
+trials = 30; %100
 
 siz = size(baseImg, 1);
 
@@ -112,7 +112,7 @@ WaitSecs(delay2);
 DrawFormattedText(window,...
     'You will be shown various images based off of this picture.', ...
     'center',(wh/2)-100,[0 0 0]);
-Screen('DrawTexture', window, showBaseImg, [(ww-siz)/2, (wh-siz)/2), (ww+siz)/2, (ww+siz)/2]);
+Screen('DrawTexture', window, showBaseImg, [(ww-siz)/2, (wh-siz)/2, (ww+siz)/2, (ww+siz)/2]);
 
 WaitSecs(delay2);
 
