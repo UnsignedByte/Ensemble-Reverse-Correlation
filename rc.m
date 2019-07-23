@@ -44,7 +44,7 @@ end
 
 ord = randperm(3*trials);
 
-w = ww/8;
+w = ww/4;
 h = w*1718/2444;
 
 mask = imread('ovalmask.jpg');
@@ -68,7 +68,7 @@ RestrictKeysForKbCheck([KbName('f'), KbName('j')]); %Restrict to f and j keys
 
 
 
-radius = wh/4;
+radius = wh/3;
 th = linspace(360/num, 360, num);
 x_circle = ww/2+cosd(th)*radius;
 y_circle = wh/2+sind(th)*radius;
@@ -81,14 +81,17 @@ delay2 = 1; %time of crosshair
 
 chosen = ones(3, trials); %List of chosen thingse
 
+cross = [-ww/100 ww/100 0 0;0 0 -ww/100 ww/100];
+crossW = wh/500;
+
 for t = 1:3*trials
-    Screen('FillArc', window, 0,[[ww/2;wh/2]-wh/100;[ww/2;wh/2]+wh/100],0,360);
+    Screen('DrawLines', window, cross, crossW, 0, [ww/2 wh/2], 2);
     Screen('Flip', window);
     WaitSecs(delay2);
     curEnsemble = cell2mat(tid(t,:)');
 
     curNoise = noises{ceil(ord(t)/trials),mod(ord(t),trials)};
-    Screen('FillArc', window, 0,[[ww/2;wh/2]-wh/200;[ww/2;wh/2]+wh/200],0,360);
+    Screen('DrawLines', window, cross, crossW, 0, [ww/2 wh/2], 2);
 
     Screen('DrawTextures', window, curEnsemble, [], coordinates); % display in grid
     Screen('Flip', window);
