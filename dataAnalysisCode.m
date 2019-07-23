@@ -9,7 +9,7 @@ baseImg = rgb2gray(imread('male.jpg'));
 
 %% Declare Vairables
 
-trials = 100; %100
+trials = 30; %100
 
 % Create starting files for averagse Trusted & Untrusted Noise
 %trustedNoise = zeros(1, filterSize, filterSize);
