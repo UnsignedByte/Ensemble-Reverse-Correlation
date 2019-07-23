@@ -5,15 +5,15 @@ close all
 
 directoryPath = 'Ensemble RC Results';
 userDirectory = dir(fullfile(directoryPath, 'user_*'));
-baseImg = imread('male.jpg');
+baseImg = rgb2gray(imread('male.jpg'));
 
 %% Declare Vairables
 
-trials = 9; %100
+trials = 30; %100
 
 % Create starting files for averagse Trusted & Untrusted Noise
-trustedNoise = zeros(1, filterSize, filterSize);
-untrustedNoise = zeros(1, filterSize, filterSize);
+%trustedNoise = zeros(1, filterSize, filterSize);
+%untrustedNoise = zeros(1, filterSize, filterSize);
 
 % Create a cell to generate multiple images later on
 windowCell = cell(3,2);
@@ -22,14 +22,24 @@ windowCell = cell(3,2);
 
 for file=1:size(userDirectory,1)
     userPath = userDirectory(file).name;
+   
     % Fetch user Files
     load(fullfile(directoryPath,userPath,'noises.mat'));
+    
     %ensembleTypes = reshape(repelem([-1, 0, 1], trials), trials, 3)';
     load(fullfile(directoryPath,userPath,'chosen.mat'));
-    meanIms = mean(chosen.*noises,1);
+    
+    noisesm = zeros(3,trials,512,512);
+    for i = 1:3
+        for j = 1:trials
+            noisesm(i,j,:,:) = noises{i,j};
+        end
+    end
+    
+    meanIms = mean(chosen.*noisesm,2);
     save(fullfile(directoryPath,userPath,'meanIms.mat'), 'meanIms');
     for i = 1:3
-        imwrite(meanims{i}+baseImg, ['Skewed_Mean_' num2str(i-2) '.png']);
+        imwrite(uint8(reshape(meanIms(i,1,:,:),512,512)+double(baseImg)), ['Skewed_Mean_' num2str(i-2) '.png']);
     end
 end
 

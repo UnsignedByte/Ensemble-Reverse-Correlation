@@ -12,7 +12,7 @@ num = 6; % # in ensemble
 
 baseImg = rgb2gray(imread('male.jpg'));
 
-trials = 100; %100
+trials = 30; %100
 siz = size(baseImg, 1);
 
 if isfile('ensembledat.mat')
@@ -65,8 +65,6 @@ res = zeros(siz,siz,trials); %what they choose
 inv = zeros(siz,siz,trials); %what they dont
 
 RestrictKeysForKbCheck([KbName('f'), KbName('j')]); %Restrict to f and j keys
-
-
 
 radius = wh/3;
 th = linspace(360/num, 360, num);
