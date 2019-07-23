@@ -1,7 +1,7 @@
 Screen('Preference', 'SkipSyncTests', 1);
 rng('Shuffle');
 KbName('UnifyKeyNames');
-init = upper(input('Initials: ', 's'));
+init = ['user_' upper(input('Initials: ', 's'))];
 [window, rect] = Screen('OpenWindow', 0, []);
 HideCursor();
 ww = rect(3); wh = rect(4);
@@ -97,14 +97,17 @@ for t = 1:3*trials
     WaitSecs(delay1);
 
     ims = (cat(3, min(uint8(double(baseImg) + curNoise),255), min(uint8(double(baseImg) - curNoise),255)));
-    ims = ims(:,:,randperm(2));
+    imsord = randperm(2);
+    ims = ims(:,:,imsord);
     Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,1)), [], [[ww/4;wh/2]-siz/2;[ww/4;wh/2]+siz/2]);
     Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,2)), [], [[3*ww/4;wh/2]-siz/2;[3*ww/4;wh/2]+siz/2]);
     Screen('Flip',window);
 
     [~, keyCode] = KbStrokeWait();
 
-    if keyCode(KbName('j')) == 1
+    if keyCode(KbName('f')) == 1 && imsord(1) == 2
+        chosen(ceil(ord(t)/trials),mod(ord(t),trials)+1) = -1;  
+    elseif keyCode(KbName('j')) == 1 && imsord(1) == 1
         chosen(ceil(ord(t)/trials),mod(ord(t),trials)+1) = -1;
     end
     Screen('Flip',window);
