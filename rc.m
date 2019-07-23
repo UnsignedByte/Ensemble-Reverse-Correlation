@@ -16,7 +16,7 @@ num = 6; % # in ensemble
 baseImg = rgb2gray(imread('male.jpg'));
 
 
-trials = 1; %100
+trials = 30; %100
 
 siz = size(baseImg, 1);
 

@@ -39,7 +39,8 @@ for file=1:size(userDirectory,1)
     meanIms = mean(chosen.*noisesm,2);
     save(fullfile(directoryPath,userPath,'meanIms.mat'), 'meanIms');
     for i = 1:3
-        imwrite(uint8(reshape(meanIms(i,1,:,:),512,512)+double(baseImg)), fullfile(directoryPath, userPath, ['Skewed_Mean_' num2str(i-2) '.png']));
+        imwrite(uint8(double(baseImg)+reshape(meanIms(i,1,:,:),512,512)), fullfile(directoryPath, userPath, ['Skewed_Mean_' num2str(i-2) '_T.png']));
+        imwrite(uint8(double(baseImg)-reshape(meanIms(i,1,:,:),512,512)), fullfile(directoryPath, userPath, ['Skewed_Mean_' num2str(i-2) '_UT.png']));
     end
 end
 
