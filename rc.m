@@ -111,7 +111,7 @@ WaitSecs(delay2);
 DrawFormattedText(window,...
     'You will be shown various images based off of this picture.', ...
     'center',(wh/2)-100,[0 0 0]);
-Screen('DrawTexture', window, showBaseImg);
+Screen('DrawTexture', window, showBaseImg, [(ww-siz)/2, (wh-siz)/2), (ww+siz)/2, (ww+siz)/2]);
 
 WaitSecs(delay2);
 
