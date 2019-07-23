@@ -15,7 +15,6 @@ num = 6; % # in ensemble
 
 baseImg = rgb2gray(imread('male.jpg'));
 
-
 trials = 30; %100
 
 siz = size(baseImg, 1);
@@ -88,6 +87,7 @@ coordinates = [x_circle(:)'-(w/2);y_circle(:)'-(h/2);x_circle(:)'+(w/2);y_circle
 ens_time = 1; %time ensemble is shown
 delay1 = 0.5; %time btwn ensemble and rc
 delay2 = 1; %time of crosshair
+delay3 = 3;
 
 chosen = ones(3, trials); %List of chosen thingse
 
@@ -96,7 +96,7 @@ crossW = wh/500;
 
 %% Instructions
 
-showBaseImg = Screen('MakeTexture', uint8(double(baseImg)));
+showBaseImg = Screen('MakeTexture', window, baseImg);
 
 Screen('TextFont',window, 'Arial');
 Screen('TextSize',window, 30);
@@ -104,31 +104,34 @@ Screen('TextStyle', window, 0);
 
 DrawFormattedText(window, ...
     'You will have 300 trials to complete.', ...
-    'center',300,[0 0 0]);
-Screen('Flip');
+    'center',300);
+Screen('Flip', window);
 
-WaitSecs(delay2);
+WaitSecs(delay3);
 
 DrawFormattedText(window,...
     'You will be shown various images based off of this picture.', ...
-    'center',(wh/2)-100,[0 0 0]);
-Screen('DrawTexture', window, showBaseImg, [(ww-siz)/2, (wh-siz)/2, (ww+siz)/2, (ww+siz)/2]);
+    'center',300);
+Screen('DrawTexture', window, showBaseImg, [], [(ww-siz)/2, (wh-siz)/2, (ww+siz)/2, (wh+siz)/2]);
+Screen('Flip', window);
 
-WaitSecs(delay2);
+WaitSecs(delay3);
 
 DrawFormattedText(window,...
     'Choose which Image appears more trustworthy, out of the 2 you are shown.', ...
-    'center',(wh/2)+100,[0 0 0]);
+    'center',300);
 
-Screen('Flip');
+Screen('Flip', window);
+
+WaitSecs(delay3);
 
 DrawFormattedText(window, ...
     'Click either f or j to begin.\n\n Click f for left image, and j for right image.', ...
-    'center',(wh/2)-100,[0 0 0]);
+    'center',300);
 
-Screen('Flip');
+Screen('Flip', window);
 
-WaitSecs(delay2);
+WaitSecs(delay3);
 
 %% Run Trials
 
@@ -138,7 +141,7 @@ for t = 1:3*trials
     WaitSecs(delay2);
     curEnsemble = cell2mat(tid(t,:)');
 
-    curNoise = noises{ceil(ord(t)/trials),mod(ord(t),trials)};
+    curNoise = noises{ceil(ord(t)/trials),mod(ord(t),trials)+1};
     Screen('DrawLines', window, cross, crossW, 0, [ww/2 wh/2], 2);
 
     Screen('DrawTextures', window, curEnsemble, [], coordinates); % display in grid
