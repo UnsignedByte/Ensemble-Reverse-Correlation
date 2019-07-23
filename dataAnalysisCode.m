@@ -9,7 +9,7 @@ baseImg = rgb2gray(imread('male.jpg'));
 
 %% Declare Vairables
 
-trials = 30; %100
+trials = 100; %100
 
 % Create starting files for averagse Trusted & Untrusted Noise
 %trustedNoise = zeros(1, filterSize, filterSize);
@@ -28,7 +28,7 @@ for file=1:size(userDirectory,1)
     
     %ensembleTypes = reshape(repelem([-1, 0, 1], trials), trials, 3)';
     load(fullfile(directoryPath,userPath,'chosen.mat'));
-    
+    trials = size(chosen, 2);
     noisesm = zeros(3,trials,512,512);
     for i = 1:3
         for j = 1:trials
@@ -39,7 +39,7 @@ for file=1:size(userDirectory,1)
     meanIms = mean(chosen.*noisesm,2);
     save(fullfile(directoryPath,userPath,'meanIms.mat'), 'meanIms');
     for i = 1:3
-        imwrite(uint8(reshape(meanIms(i,1,:,:),512,512)+double(baseImg)), ['Skewed_Mean_' num2str(i-2) '.png']);
+        imwrite(uint8(reshape(meanIms(i,1,:,:),512,512)+double(baseImg)), fullfile(directoryPath, userPath, ['Skewed_Mean_' num2str(i-2) '.png']));
     end
 end
 
