@@ -160,7 +160,7 @@ for t = 1:3*trials
     [~, keyCode] = KbStrokeWait();
 
     if keyCode(KbName('f')) == 1 && imsord(1) == 2
-        chosen(ceil(ord(t)/trials),mod(ord(t),trials)+1) = -1;  
+        chosen(ceil(ord(t)/trials),mod(ord(t),trials)+1) = -1;
     elseif keyCode(KbName('j')) == 1 && imsord(1) == 1
         chosen(ceil(ord(t)/trials),mod(ord(t),trials)+1) = -1;
     end
