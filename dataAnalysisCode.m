@@ -102,4 +102,4 @@ for file=1:size(userDirectory,1)
 end
 
 % Save Deviation Data
-save([directoryPath, userPath,'UserStandardDev.mat'], 'userStandardDev');
+save(fullfile([directoryPath, userPath,'UserStandardDev.mat']), 'userStandardDev');
