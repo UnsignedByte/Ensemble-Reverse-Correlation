@@ -16,7 +16,7 @@ num = 6; % # in ensemble
 
 baseImg = rgb2gray(imread('male.jpg'));
 
-trials = 10; %100
+trials = 300; %100
 
 siz = size(baseImg, 1);
 sk = [-1 0]; %which skews included
