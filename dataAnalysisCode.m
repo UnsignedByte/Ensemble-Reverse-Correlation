@@ -1,7 +1,11 @@
+%% PROGRAM RECORDS MEAN, STANDARD DEV, AREAS OF PRIORITY FOR EACH USER'S CHOICE OF TRUSTWORTHINESS GIVEN ENSEMBLE SKEW
+
 %% Clear variables
 
 clear all
 close all
+
+%% Declare File and Photo Paths
 
 directoryPath = 'Ensemble RC Results';
 userDirectory = dir(fullfile(directoryPath, 'user_*'));
@@ -9,73 +13,85 @@ baseImg = rgb2gray(imread('male.jpg'));
 
 %% Declare Vairables
 
-trials = 30; %100
-
-% Create starting files for averagse Trusted & Untrusted Noise
-%trustedNoise = zeros(1, filterSize, filterSize);
-%untrustedNoise = zeros(1, filterSize, filterSize);
-
-% Create a cell to generate multiple images later on
+trials = 100;
+filterSize = 512;
 windowCell = cell(3,2);
+userStandardDev = zeros(3,1);
 
 %% Find different Skew Indices
 
+% Iterate through each User
 for file=1:size(userDirectory,1)
     userPath = userDirectory(file).name;
    
     % Fetch user Files
     load(fullfile(directoryPath,userPath,'noises.mat'));
-    
-    %ensembleTypes = reshape(repelem([-1, 0, 1], trials), trials, 3)';
     load(fullfile(directoryPath,userPath,'chosen.mat'));
+    
+    % Reset Trial Size
     trials = size(chosen, 2);
-    noisesm = zeros(3,trials,512,512);
+    noisesm = zeros(3, trials, filterSize, filterSize);
+    
+    % Transfer Noise Data, by Row (The Noise's Skew Index)
     for i = 1:3
         for j = 1:trials
             noisesm(i,j,:,:) = noises{i,j};
         end
     end
     
-    meanIms = mean(chosen.*noisesm,2);
+    %Define List of Noise Arrays and their Mean
+    userImgSet = chosen.*noisesm;
+    meanIms = mean(userImgSet,2);
+    
+    % Save the Noise Mean
     save(fullfile(directoryPath,userPath,'meanIms.mat'), 'meanIms');
     for i = 1:3
-        imwrite(uint8(double(baseImg)+reshape(meanIms(i,1,:,:),512,512)), fullfile(directoryPath, userPath, ['Skewed_Mean_' num2str(i-2) '_T.png']));
-        imwrite(uint8(double(baseImg)-reshape(meanIms(i,1,:,:),512,512)), fullfile(directoryPath, userPath, ['Skewed_Mean_' num2str(i-2) '_UT.png']));
+        
+        % Find variance of all arrays in set
+        selectUserImgSet = reshape(userImgSet(i,:,:,:), trials, filterSize, filterSize);
+        baselineImgSet = reshape(meanIms(i,1,:,:), 1, filterSize, filterSize);
+        stdevImg = zeros(filterSize^2,1);
+        
+        aggregateDiff = (selectUserImgSet(:,:,:)-baselineImgSet).^2;
+        
+        for pixel=1:filterSize^2
+            stdevImg(pixel) = sqrt(sum(aggregateDiff(:,floor((pixel-1)/filterSize)+1, mod(pixel, filterSize)+1)))/trials;
+        end
+        
+        disp(['The standard deviation for row ' num2str(i) ' is: ' num2str(mean(stdevImg))]);
+        
+        userStandardDev(i) = mean(stdevImg);
+        
+        % Open new Drawing Window, and Display Mean Image
+        windowCell{i,1} = figure;
+        meanImg = reshape(meanIms(i,1,:,:), filterSize, filterSize);
+        dispMeanImg = meanImg+double(baseImg);
+        imwrite(uint8(dispMeanImg), fullfile(directoryPath, userPath, ['Skewed_Mean_' num2str(i-2) '.png']));
+        
+        % Find areas of importance
+        emphasizedImg = zeros(filterSize,filterSize,3);
+        flatMeanImg = round(reshape(meanImg, filterSize^2, 1));
+        flatBaseImg = round(reshape(baseImg, 1, filterSize, filterSize));
+        
+        % Create RBG Image to display
+        
+        for layer=1:3
+            emphasizedImg(:, :, layer) = flatBaseImg;
+        end
+        
+        % Open new Drawing Window, and Display Areas of Priority
+        windowCell{i,2} = figure;
+       
+        [preferVals, preferIndices] = maxk(flatMeanImg, 100); %Bright Spot Correlation
+        [deterVals, deterIndices] = mink(flatMeanImg, 100); % Dark Spot Correlation
+        
+        emphasizedImg(floor((preferIndices-1)./filterSize)+1, mod(preferIndices, filterSize)+1, 2) = 255;
+        emphasizedImg(floor((deterIndices-1)./filterSize)+1, mod(deterIndices, filterSize)+1, 1) = 255;
+        
+        imwrite(uint8(emphasizedImg), fullfile(directoryPath, userPath, ['Weighted_Areas_Skewed_Mean_' num2str(i-2) '.png']));
     end
 end
 
-%{
-% Find ensemble skew based on position at which matrix is marked
-trustedNoise = trustedNoise(2:end,:,:);
-skewArray = [blackSkewIndices, neutralSkewIndices, whiteSkewIndices];
-
-%% Sum up each Skew-Indexed Image
-
-for skew=1:3
-    imageIndices = skewArray(skew);
-    sumImage = zeros(filterSize, filterSize);
-    for index=1:length(imageIndices)
-        disp(size(trustedNoise(index,:,:)));
-        sumImage = sumImage + reshape(trustedNoise(index,:,:), filterSize, filterSize);
-    end
-    meanImage = sumImage ./ length(imageIndices);
-    
-    windowCell{skew,1} = figure;
-    graySumImage = uint8(meanImage);
-    image(graySumImage);
-    colormap(gray(256));
-    
-    threshold = [mean(meanImage)-std(meanImage), mean(meanImage)+std(meanImage)];
-    
-    blankBackground = zeros(filterSize, filterSize);
-    
-    preferImage = find(meanImage > threshold(2) | meanImage < threshold(1));
-    windowCell{skew,2} = figure;
-    blankBackground(preferImage) = 255;
-    blankBackground = uint8(blankBackground);
-    image(blankBackground);
-    colormap(gray(256));
-end
-%}
-
+% Save Deviation Data
+save([directoryPath, userPath,'UserStandardDev.mat'], 'userStandardDev');
 
