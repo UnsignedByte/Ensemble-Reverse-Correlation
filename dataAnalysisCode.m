@@ -18,6 +18,8 @@ directoryPath = 'Ensemble RC Results';
 userDirectory = dir(fullfile(directoryPath, 'user_*'));
 baseImg = rgb2gray(imread('male.jpg'));
 
+
+maskSize = 1580;
 maskImg = round(double(rgb2gray(imread('ovalmask.jpg'))),1);
 maskImg = maskImg(1:maskSize, 431:maskSize+430);
 maskImg = imresize(maskImg, filterSize/maskSize);
@@ -92,8 +94,8 @@ for file=1:size(userDirectory,1)
         [preferVals, preferIndices] = maxk(flatMeanImg(:), 100);
         [deterVals, deterIndices] = mink(flatMeanImg(:), 100);
        
-        emphasizedImg(mod(preferIndices, 512)+1, floor((preferIndices-1)./512)+1, 2) = 255;
-        emphasizedImg(mod(deterIndices, 512)+1, floor((deterIndices-1)./512)+1, 1) = 255;
+        emphasizedImg(mod(preferIndices, filterSize)+1, floor((preferIndices-1)./filterSize)+1, 2) = 255;
+        emphasizedImg(mod(deterIndices, filterSize)+1, floor((deterIndices-1)./filterSize)+1, 1) = 255;
         
         imwrite(uint8(emphasizedImg), fullfile(directoryPath, userPath, ['Weighted_Areas_Skewed_Mean_' num2str(i-2) '.png']));
     end
