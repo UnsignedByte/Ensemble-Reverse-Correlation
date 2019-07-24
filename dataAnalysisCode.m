@@ -5,12 +5,6 @@
 clear all
 close all
 
-%% Declare File and Photo Paths
-
-directoryPath = 'Ensemble RC Results';
-userDirectory = dir(fullfile(directoryPath, 'user_*'));
-baseImg = rgb2gray(imread('male.jpg'));
-
 %% Declare Vairables
 
 trials = 100;
@@ -18,6 +12,16 @@ filterSize = 512;
 windowCell = cell(3,2);
 userStandardDev = zeros(3,1);
 
+%% Declare File and Photo Paths
+
+directoryPath = 'Ensemble RC Results';
+userDirectory = dir(fullfile(directoryPath, 'user_*'));
+baseImg = rgb2gray(imread('male.jpg'));
+
+maskImg = round(double(rgb2gray(imread('ovalmask.jpg'))),1);
+maskImg = maskImg(1:maskSize, 431:maskSize+430);
+maskImg = imresize(maskImg, filterSize/maskSize);
+maskImg = reshape(maskImg, filterSize^2, 1);
 %% Find different Skew Indices
 
 % Iterate through each User
@@ -81,12 +85,15 @@ for file=1:size(userDirectory,1)
         
         % Open new Drawing Window, and Display Areas of Priority
         windowCell{i,2} = figure;
-       
-        [preferVals, preferIndices] = maxk(flatMeanImg, 100); %Bright Spot Correlation
-        [deterVals, deterIndices] = mink(flatMeanImg, 100); % Dark Spot Correlation
         
-        emphasizedImg(floor((preferIndices-1)./filterSize)+1, mod(preferIndices, filterSize)+1, 2) = 255;
-        emphasizedImg(floor((deterIndices-1)./filterSize)+1, mod(deterIndices, filterSize)+1, 1) = 255;
+        selectIndices = find(maskImg(:) == 0);
+        flatMeanImg(selectIndices) = NaN;
+       
+        [preferVals, preferIndices] = maxk(flatMeanImg(:), 100);
+        [deterVals, deterIndices] = mink(flatMeanImg(:), 100);
+       
+        emphasizedImg(mod(preferIndices, 512)+1, floor((preferIndices-1)./512)+1, 2) = 255;
+        emphasizedImg(mod(deterIndices, 512)+1, floor((deterIndices-1)./512)+1, 1) = 255;
         
         imwrite(uint8(emphasizedImg), fullfile(directoryPath, userPath, ['Weighted_Areas_Skewed_Mean_' num2str(i-2) '.png']));
     end
@@ -94,4 +101,3 @@ end
 
 % Save Deviation Data
 save([directoryPath, userPath,'UserStandardDev.mat'], 'userStandardDev');
-
