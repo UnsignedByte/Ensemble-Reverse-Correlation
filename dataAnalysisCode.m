@@ -74,13 +74,10 @@ for file=1:size(userDirectory,1)
         imwrite(uint8(double(baseImg)+meanImg), fullfile(directoryPath, userPath, ['Mean_' num2str(i-2) '_norm.png']));
         imwrite(uint8(double(baseImg)-meanImg), fullfile(directoryPath, userPath, ['Mean_' num2str(i-2) '_rev.png']));
 
-        % Find areas of importance
-        emphasizedImg = zeros(filterSize,filterSize,3);
-
         % Create RBG Image to display
         emphasizedImg = repmat(baseImg,1,1,3);
-
-        emphasizedImg = emphasizedImg'; % Idunno why, but the mask image is transposed so
+        
+        % Idunno why, but the mask image is transposed so
 
         % Open new Drawing Window, and Display Areas of Priority
         %windowCell{i,2} = figure;
@@ -97,7 +94,7 @@ for file=1:size(userDirectory,1)
         %emphasizedImg(mod(deterIndices, filterSize)+1, floor((deterIndices-1)./filterSize)+1, 1) = 255;
 
         % Again transposes, does it switch Back, idk
-        imwrite(uint8(emphasizedImg'), fullfile(directoryPath, userPath, ['Weighted_Areas_Mean_' num2str(i-2) '.png']));
+        imwrite(uint8(emphasizedImg), fullfile(directoryPath, userPath, ['Weighted_Areas_Mean_' num2str(i-2) '.png']));
     end
 
     % Save Deviation Data
