@@ -135,10 +135,10 @@ WaitSecs(delay1);
 
 DrawFormattedText(window,...
     'Choose the image that appears more dominant out of the 2 shown.', ...
-    'center',300);
+    'center',100);
 
-Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,1)), [], [[ww/4;wh/2]-siz/2;[ww/4;wh/2]+siz/2]);
-Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,2)), [], [[3*ww/4;wh/2]-siz/2;[3*ww/4;wh/2]+siz/2]);
+Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,1)), [], [[ww/3;wh/2]-wh/6;[ww/3;wh/2]+wh/6]);
+Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,2)), [], [[2*ww/3;wh/2]-wh/6;[2*ww/3;wh/2]+wh/6]);
 
 DrawFormattedText(window, ...
     'Click either f or j to begin.\n Click f for left image, and j for right image.', ...
