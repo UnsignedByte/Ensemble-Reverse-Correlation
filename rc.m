@@ -15,7 +15,7 @@ num = 6; % # in ensemble
 
 baseImg = rgb2gray(imread('male.jpg'));
 
-trials = 100; %100
+trials = 10; %100
 
 siz = size(baseImg, 1);
 
@@ -153,7 +153,7 @@ for t = 1:3*trials
     ims = (cat(3, min(uint8(double(baseImg) + curNoise),255), min(uint8(double(baseImg) - curNoise),255)));
     imsord = randperm(2);
     ims = ims(:,:,imsord);
-    DrawFormattedText(window, num2str(t), 'center', 'center');
+    %DrawFormattedText(window, num2str(t), 'center', 'center');
     Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,1)), [], [[ww/4;wh/2]-siz/2;[ww/4;wh/2]+siz/2]);
     Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,2)), [], [[3*ww/4;wh/2]-siz/2;[3*ww/4;wh/2]+siz/2]);
     Screen('Flip',window);
