@@ -87,6 +87,8 @@ for file=1:size(userDirectory,1)
             emphasizedImg(:, :, layer) = flatBaseImg;
         end
         
+        emphasizedImg = emphasizedImg'; % Idunno why, but the mask image is transposed so
+        
         % Open new Drawing Window, and Display Areas of Priority
         windowCell{i,2} = figure;
         
@@ -96,10 +98,11 @@ for file=1:size(userDirectory,1)
         [preferVals, preferIndices] = maxk(flatMeanImg(:), 100);
         [deterVals, deterIndices] = mink(flatMeanImg(:), 100);
        
-        emphasizedImg(mod(preferIndices, filterSize)+1, floor((preferIndices-1)./filterSize)+1, 2) = 255;
-        emphasizedImg(mod(deterIndices, filterSize)+1, floor((deterIndices-1)./filterSize)+1, 1) = 255;
+        emphasizedImg(floor((preferIndices-1)./filterSize)+1, mod(preferIndices, filterSize)+1, 2) = 255; % Indices 1 and 2 shifted
+        emphasizedImg(floor((deterIndices-1)./filterSize)+1, mod(deterIndices, filterSize)+1, 1) = 255;
         
-        imwrite(uint8(emphasizedImg), fullfile(directoryPath, userPath, ['Weighted_Areas_Mean_' num2str(i-2) '.png']));
+        % Again transposes, does it switch Back, idk
+        imwrite(uint8(emphasizedImg'), fullfile(directoryPath, userPath, ['Weighted_Areas_Mean_' num2str(i-2) '.png']));
     end
 end
 
