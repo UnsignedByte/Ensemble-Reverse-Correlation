@@ -18,13 +18,10 @@ userStandardDev = zeros(3,1);
 directoryPath = 'Ensemble RC Results';
 userDirectory = dir(fullfile(directoryPath, 'user_*'));
 
-
-maskSize = 1580;
-maskImg = round(double(rgb2gray(imread('ovalmask.jpg'))),1);
-maskImg = maskImg(1:maskSize, 431:maskSize+430);
-maskImg = imresize(maskImg, filterSize/maskSize);
-maskImg = reshape(maskImg, filterSize^2, 1);
 %% Find different Skew Indices
+    
+maleMask = imread('malemask.png');
+maleMask = double(maleMask(:,:,1)/255);
 
 % Iterate through each User
 for file=1:size(userDirectory,1)
@@ -66,42 +63,41 @@ for file=1:size(userDirectory,1)
         end
         
         disp(['The standard deviation for row ' num2str(i) ' is: ' num2str(mean(stdevImg))]);
+ 
         
         userStandardDev(i) = mean(stdevImg);
         
         % Open new Drawing Window, and Display Mean Image
-        windowCell{i,1} = figure;
-        meanImg = reshape(meanIms(i,1,:,:), filterSize, filterSize);
+        %windowCell{i,1} = figure;
+        meanImg = 15/userStandardDev(i)*reshape(meanIms(i,1,:,:), filterSize, filterSize);
         %Draw noise + image with scaled stdev
-        imwrite(uint8(double(baseImg)+15/userStandardDev(i)*meanImg), fullfile(directoryPath, userPath, ['Mean_' num2str(i-2) '_norm.png']));
-        imwrite(uint8(double(baseImg)-15/userStandardDev(i)*meanImg), fullfile(directoryPath, userPath, ['Mean_' num2str(i-2) '_rev.png']));
+        imwrite(uint8(double(baseImg)+meanImg), fullfile(directoryPath, userPath, ['Mean_' num2str(i-2) '_norm.png']));
+        imwrite(uint8(double(baseImg)-meanImg), fullfile(directoryPath, userPath, ['Mean_' num2str(i-2) '_rev.png']));
         
         % Find areas of importance
         emphasizedImg = zeros(filterSize,filterSize,3);
-        flatMeanImg = round(reshape(meanImg, filterSize^2, 1));
-        flatBaseImg = round(reshape(baseImg, 1, filterSize, filterSize));
         
         % Create RBG Image to display
-        
-        for layer=1:3
-            emphasizedImg(:, :, layer) = flatBaseImg;
-        end
+        emphasizedImg = repmat(baseImg,1,1,3);
         
         % Open new Drawing Window, and Display Areas of Priority
-        windowCell{i,2} = figure;
+        %windowCell{i,2} = figure;
         
-        selectIndices = find(maskImg(:) == 0);
-        flatMeanImg(selectIndices) = NaN;
-       
-        [preferVals, preferIndices] = maxk(flatMeanImg(:), 100);
-        [deterVals, deterIndices] = mink(flatMeanImg(:), 100);
-       
-        emphasizedImg(mod(preferIndices, filterSize)+1, floor((preferIndices-1)./filterSize)+1, 2) = 255;
-        emphasizedImg(mod(deterIndices, filterSize)+1, floor((deterIndices-1)./filterSize)+1, 1) = 255;
+        filtmeanImg = imgaussfilt(meanImg.*maleMask,10);
+        miiqr = iqr(reshape(filtmeanImg, 1,filterSize^2));
+        mimean = mean(reshape(filtmeanImg, 1,filterSize^2));
+        outlierfactor = 3;
+        
+        emphasizedImg(:,:,2) = emphasizedImg(:,:,2)+uint8(double(255-emphasizedImg(:,:,2)).*(filtmeanImg>(mimean+miiqr*outlierfactor)));
+        emphasizedImg(:,:,1) = emphasizedImg(:,:,1)+uint8(double(255-emphasizedImg(:,:,1)).*(filtmeanImg<(mimean-miiqr*outlierfactor)));
+        
+        %emphasizedImg(mod(preferIndices, filterSize)+1, floor((preferIndices-1)./filterSize)+1, 2) = 255;
+        %emphasizedImg(mod(deterIndices, filterSize)+1, floor((deterIndices-1)./filterSize)+1, 1) = 255;
         
         imwrite(uint8(emphasizedImg), fullfile(directoryPath, userPath, ['Weighted_Areas_Mean_' num2str(i-2) '.png']));
     end
+    
+    % Save Deviation Data
+    save(fullfile(directoryPath, userPath,'UserStandardDev.mat'), 'userStandardDev');
 end
 
-% Save Deviation Data
-save(fullfile(directoryPath, userPath,'UserStandardDev.mat'), 'userStandardDev');
