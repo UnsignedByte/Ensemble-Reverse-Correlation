@@ -1,6 +1,6 @@
 function [ensemble,data] = create_ensemble(ensembledat, num, skew)
 
-    wcols = [1 3 4]; %which columns of data to save
+    wcols = [1 4 5]; %which columns of data to save
 
     if skew == -1
         ensemble = ensembledat{1}(randperm(size(ensembledat{1},1),num-1), wcols);
@@ -15,5 +15,5 @@ function [ensemble,data] = create_ensemble(ensembledat, num, skew)
     
     ensemble = ensemble(randperm(num),:);
     data = ensemble(:, 2:end)';
-    ensemble = ensemble(:,1)';
+    ensemble = cell2mat(ensemble(:,1)');
 end

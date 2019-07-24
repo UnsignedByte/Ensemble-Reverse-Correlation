@@ -33,15 +33,15 @@ end
 ensembles = cell(nsk, trials);
 ensembledata = cell(nsk, trials);
 
-noises = cell(trials,1);
-
 %% Generate Noise
 
-for i = 1:trials
-    DrawFormattedText(window, ['Generating Noise...\n' num2str(floor(i/trials*100)) '%'], 'center', 'center');
-    Screen('Flip', window);
-    noises{i} = generate_noise(siz);
+if isfile('noises.mat')
+    load('noises.mat');
+    noises = noises(1:trials,:);
+else
+    generate_noises(trials, siz);
 end
+
 noises = repmat(noises, 1,nsk)';
 for i = 1:nsk
     noises(i,:) = noises(i, randperm(trials));
@@ -58,23 +58,28 @@ w = ww/4;
 h = w*1718/2444;
 
 mask = imread('ovalmask.jpg');
-mask = imresize(mask, size(ensembles{1,1}{1}(:,:,1)));
+mask = imresize(mask, size(ensembledat{1}{1,2}(:,:,1)));
 mask = mask(:,:,1);
 
-tid = cell(nsk*trials, num);
-for i = 1:nsk*trials
-    for j = 1:num
-        DrawFormattedText(window, ['Making Textures...\n' num2str(floor(((i-1)*num+j)/trials/num/nsk*100)) '%'], 'center', 'center');
-        Screen('Flip', window);
-        a = ensembles{ceil(ord(i)/trials),mod(ord(i),trials)+1}{j};
+
+siz1 = size(ensembledat{1},1);
+siz2 = size(ensembledat{2},1);
+for i = 1:siz1+siz2
+    DrawFormattedText(window, ['Making Textures...\n' num2str(floor(i/(siz1+siz2)*100)) '%'], 'center', 'center');
+    Screen('Flip', window);
+    if i > siz1
+        a = ensembledat{2}{i-siz1, 2};
         a(:,:,4) = mask;
-        tid{i,j} = Screen('MakeTexture', window, a);
+        ensembledat{2}{i-siz1, 2} = Screen('MakeTexture', window, a);
+    else
+        a = ensembledat{1}{i, 2};
+        a(:,:,4) = mask;
+        ensembledat{1}{i, 2} = Screen('MakeTexture', window, a);
     end
 end
+
 res = zeros(siz,siz,trials); %what they choose
 inv = zeros(siz,siz,trials); %what they dont
-
-
 
 radius = wh/3;
 th = linspace(360/num, 360, num);
@@ -83,10 +88,9 @@ y_circle = wh/2+sind(th)*radius;
 
 coordinates = [x_circle(:)'-(w/2);y_circle(:)'-(h/2);x_circle(:)'+(w/2);y_circle(:)'+(h/2)];
 
-ens_time = 1; %time ensemble is shown
-delay1 = 0.5; %time btwn ensemble and rc
-delay2 = 1; %time of crosshair
-delay3 = 3;
+ens_time = 0.5; %time ensemble is shown
+delay1 = 0; %time btwn ensemble and rc
+delay2 = 0.5; %time of crosshair
 
 chosen = ones(nsk, trials); %List of chosen thingse
 
@@ -118,7 +122,7 @@ Screen('DrawLines', window, cross, crossW, 0, [ww/2 wh/2], 2);
 Screen('Flip', window);
 WaitSecs(delay2);
 t = trials*nsk;
-curEnsemble = cell2mat(tid(t,:)');
+curEnsemble = ensembles{ceil(ord(t)/trials),mod(ord(t),trials)+1} + ensembledat{1}{1,2};
 
 curNoise = noises{ceil(ord(t)/trials),mod(ord(t),trials)+1};
 
@@ -130,15 +134,15 @@ Screen('Flip', window);
 WaitSecs(delay1);
 
 DrawFormattedText(window,...
-    'Choose the image that appears more trustworthy out of the 2 shown.', ...
+    'Choose the image that appears more dominant out of the 2 shown.', ...
     'center',300);
 
 Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,1)), [], [[ww/4;wh/2]-siz/2;[ww/4;wh/2]+siz/2]);
 Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,2)), [], [[3*ww/4;wh/2]-siz/2;[3*ww/4;wh/2]+siz/2]);
 
 DrawFormattedText(window, ...
-    'Click either f or j to begin.\n\n Click f for left image, and j for right image.', ...
-    'center',wh-300);
+    'Click either f or j to begin.\n Click f for left image, and j for right image.', ...
+    'center',wh-100);
 
 Screen('Flip', window);
 
@@ -150,7 +154,7 @@ for t = 1:nsk*trials
     Screen('DrawLines', window, cross, crossW, 0, [ww/2 wh/2], 2);
     Screen('Flip', window, 0, 1);
     WaitSecs(delay2);
-    curEnsemble = cell2mat(tid(t,:)');
+    curEnsemble = ensembles{ceil(ord(t)/trials),mod(ord(t),trials)+1} + ensembledat{1}{1,2};
 
     curNoise = noises{ceil(ord(t)/trials),mod(ord(t),trials)+1};
 
@@ -164,8 +168,8 @@ for t = 1:nsk*trials
     imsord = randperm(2);
     ims = ims(:,:,imsord);
     %DrawFormattedText(window, num2str(t), 'center', 'center');
-    Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,1)), [], [[ww/4;wh/2]-siz/2;[ww/4;wh/2]+siz/2]);
-    Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,2)), [], [[3*ww/4;wh/2]-siz/2;[3*ww/4;wh/2]+siz/2]);
+    Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,1)), [], [[ww/3;wh/2]-wh/6;[ww/3;wh/2]+wh/6]);
+    Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,2)), [], [[2*ww/3;wh/2]-wh/6;[2*ww/3;wh/2]+wh/6]);
     Screen('Flip',window);
 
     [~, keyCode] = KbStrokeWait();
