@@ -8,7 +8,8 @@ close all
 %% Declare Vairables
 
 trials = 100;
-filterSize = 512;
+baseImg = rgb2gray(imread('male.jpg'));
+filterSize = size(baseImg,1);
 windowCell = cell(3,2);
 userStandardDev = zeros(3,1);
 
@@ -16,7 +17,6 @@ userStandardDev = zeros(3,1);
 
 directoryPath = 'Ensemble RC Results';
 userDirectory = dir(fullfile(directoryPath, 'user_*'));
-baseImg = rgb2gray(imread('male.jpg'));
 
 
 maskSize = 1580;
@@ -36,10 +36,11 @@ for file=1:size(userDirectory,1)
     
     % Reset Trial Size
     trials = size(chosen, 2);
-    noisesm = zeros(3, trials, filterSize, filterSize);
+    nsk = size(chosen, 1);
+    noisesm = zeros(nsk, trials, filterSize, filterSize);
     
     % Transfer Noise Data, by Row (The Noise's Skew Index)
-    for i = 1:3
+    for i = 1:nsk
         for j = 1:trials
             noisesm(i,j,:,:) = noises{i,j};
         end
@@ -51,7 +52,7 @@ for file=1:size(userDirectory,1)
     
     % Save the Noise Mean
     save(fullfile(directoryPath,userPath,'meanIms.mat'), 'meanIms');
-    for i = 1:3
+    for i = 1:nsk
         
         % Find variance of all arrays in set
         selectUserImgSet = reshape(userImgSet(i,:,:,:), trials, filterSize, filterSize);
@@ -71,8 +72,9 @@ for file=1:size(userDirectory,1)
         % Open new Drawing Window, and Display Mean Image
         windowCell{i,1} = figure;
         meanImg = reshape(meanIms(i,1,:,:), filterSize, filterSize);
-        dispMeanImg = meanImg+double(baseImg);
-        imwrite(uint8(dispMeanImg), fullfile(directoryPath, userPath, ['Skewed_Mean_' num2str(i-2) '.png']));
+        %Draw noise + image with scaled stdev
+        imwrite(uint8(double(baseImg)+15/userStandardDev(i)*meanImg), fullfile(directoryPath, userPath, ['Mean_' num2str(i-2) '_norm.png']));
+        imwrite(uint8(double(baseImg)-15/userStandardDev(i)*meanImg), fullfile(directoryPath, userPath, ['Mean_' num2str(i-2) '_rev.png']));
         
         % Find areas of importance
         emphasizedImg = zeros(filterSize,filterSize,3);
@@ -97,9 +99,9 @@ for file=1:size(userDirectory,1)
         emphasizedImg(mod(preferIndices, filterSize)+1, floor((preferIndices-1)./filterSize)+1, 2) = 255;
         emphasizedImg(mod(deterIndices, filterSize)+1, floor((deterIndices-1)./filterSize)+1, 1) = 255;
         
-        imwrite(uint8(emphasizedImg), fullfile(directoryPath, userPath, ['Weighted_Areas_Skewed_Mean_' num2str(i-2) '.png']));
+        imwrite(uint8(emphasizedImg), fullfile(directoryPath, userPath, ['Weighted_Areas_Mean_' num2str(i-2) '.png']));
     end
 end
 
 % Save Deviation Data
-save(fullfile([directoryPath, userPath,'UserStandardDev.mat']), 'userStandardDev');
+save(fullfile(directoryPath, userPath,'UserStandardDev.mat'), 'userStandardDev');
