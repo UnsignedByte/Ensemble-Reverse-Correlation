@@ -8,6 +8,7 @@ init = ['user_' upper(input('Initials: ', 's'))];
 HideCursor();
 ww = rect(3); wh = rect(4);
 Screen('BlendFunction', window,GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+RestrictKeysForKbCheck([]);
 
 %% Define Trial Variables
 
@@ -114,12 +115,14 @@ DrawFormattedText(window,...
     'Focus on the crosshair in the center.', ...
     'center',300);
 Screen('DrawLines', window, cross, crossW, 0, [ww/2 wh/2], 2);
-Screen('Flip', window, 0, 0);
+Screen('Flip', window);
 WaitSecs(delay2);
+t = trials*nsk;
 curEnsemble = cell2mat(tid(t,:)');
 
 curNoise = noises{ceil(ord(t)/trials),mod(ord(t),trials)+1};
 
+Screen('DrawLines', window, cross, crossW, 0, [ww/2 wh/2], 2);
 Screen('DrawTextures', window, curEnsemble, [], coordinates); % display in grid
 Screen('Flip', window);
 WaitSecs(ens_time);
@@ -129,25 +132,23 @@ WaitSecs(delay1);
 DrawFormattedText(window,...
     'Choose the image that appears more trustworthy out of the 2 shown.', ...
     'center',300);
-Screen('DrawTexture', window, showBaseImg, [], [(ww-siz)/2, (wh-siz)/2, (ww+siz)/2, (wh+siz)/2]);
-Screen('Flip', window);
 
-WaitSecs(delay3);
+Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,1)), [], [[ww/4;wh/2]-siz/2;[ww/4;wh/2]+siz/2]);
+Screen('DrawTexture', window, Screen('MakeTexture',window,ims(:,:,2)), [], [[3*ww/4;wh/2]-siz/2;[3*ww/4;wh/2]+siz/2]);
 
 DrawFormattedText(window, ...
     'Click either f or j to begin.\n\n Click f for left image, and j for right image.', ...
-    'center',300);
+    'center',wh-300);
 
 Screen('Flip', window);
 
-WaitSecs(delay3);
-
 %% Run Trials
 RestrictKeysForKbCheck([KbName('f'), KbName('j')]); %Restrict to f and j keys
+KbStrokeWait();
 
 for t = 1:nsk*trials
     Screen('DrawLines', window, cross, crossW, 0, [ww/2 wh/2], 2);
-    Screen('Flip', window, 0, 0);
+    Screen('Flip', window, 0, 1);
     WaitSecs(delay2);
     curEnsemble = cell2mat(tid(t,:)');
 
