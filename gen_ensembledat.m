@@ -1,7 +1,7 @@
 ensembledat = readcell(fullfile('CFD Version 2.0.3', 'CFD 2.0.3 Norming Data and Codebook.xlsx'), 'Sheet', 'CFD 2.0.3 Norming Data'); %Read in ensemble excel
 ensembledat = ensembledat(6:end,:);
-ensembledat = ensembledat(strcmp(ensembledat(:,2), 'W'),:); %Get only males
-ensembledat = {ensembledat(strcmp(ensembledat(:,3), 'F'),:),ensembledat(strcmp(ensembledat(:,3), 'M'),:)};
+ensembledat = ensembledat(strcmp(ensembledat(:,3), 'M'),:); %Get only males
+ensembledat = {ensembledat(strcmp(ensembledat(:,2), 'B'),:),ensembledat(strcmp(ensembledat(:,2), 'W'),:)};
 ensembledat{1} = [num2cell((1:size(ensembledat{1},1))') ensembledat{1}];
 ensembledat{2} = [num2cell(((1:size(ensembledat{2},1))')+size(ensembledat{1},1)) ensembledat{2}];
 
